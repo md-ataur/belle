@@ -1,0 +1,130 @@
+<div class="page section-header text-center">
+  <div class="page-title">
+    <div class="wrapper">
+      <h1 class="page-width">{{ 'general.search.title' | t }}</h1>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+  {% paginate search.results by 12 %}
+
+    <h1 class="mb-3">
+      {% if search.performed %}
+        <span class="visually-hidden">{{ 'general.search.heading' | t: count: search.results_count }}:</span>
+        {{ 'general.search.results_with_count' | t: terms: search.terms, count: search.results_count }}
+      {% else %}
+        {{ 'general.search.title' | t }}
+      {% endif %}
+    </h1>
+
+    <!-- <form action="/search" method="get" role="search">
+      <label for="Search" class="label-hidden">
+        {{ 'general.search.placeholder' | t }}
+      </label>
+      <input type="search"
+        name="q"
+        id="Search"
+        value="{{ search.terms | escape }}"
+        placeholder="{{ 'general.search.placeholder' | t }}">
+      <button type="submit" class="button">
+        {% include 'icon-search' %}
+        <span class="icon-fallback-text">{{ 'general.search.submit' | t }}</span>
+      </button>
+    </form> -->
+
+    {% if search.performed %}
+      {% if search.results_count == 0 %}
+        <p>{{ 'general.search.no_results_html' | t: terms: search.terms }}</p>
+      {% else %}
+        <h2 class="visually-hidden">{{ 'general.search.heading' | t: count: search.results_count }}</h2>
+        <div class="grid-products grid--view-items">
+          <div data-next-url="{{paginate.next.url}}" class="products-on-page row">
+            {% for product in search.results %}
+              <div class="col-6 col-sm-6 col-md-3 col-lg-3 item">
+                <!-- start product image -->
+                <div class="product-image">
+                  <!-- start product image -->
+                  <a href="{{ product.url | within: collection }}">
+                    <!-- image -->
+                    <img class="primary blur-up lazyload" data-src="{{  product.images[0] | img_url: 'master' }}"
+                      src="{{  product.images[0] | img_url: 'master' }}" alt="image" title="product">
+                    <!-- End image -->
+                    <!-- Hover image -->
+                    <img class="hover blur-up lazyload" data-src="{{  product.images[1] | img_url: 'master' }}"
+                      src="{{  product.images[1] | img_url: 'master' }}" alt="image" title="product">
+                    <!-- End hover image -->
+                  </a>
+                  <!-- end product image -->
+
+                  <!-- Start product button -->
+                  <form class="variants add" id="form-{{ product.handle }}" action="/cart/add" method="post">
+                    <input type="hidden" name="id" value="{{ product.variants.first.id }}" />
+                    <button onclick="document.getElementById('form-{{product.handle}}').submit()" class="btn btn-addto-cart" type="button">Add to cart</button>
+                  </form>
+                  <div class="button-set">
+                    <div class="wishlist-btn">
+                      <a class="wishlist add-to-wishlist" href="#" title="Add to Wishlist">
+                        <i class="icon anm anm-heart-l"></i>
+                      </a>
+                    </div>
+                    <div class="compare-btn">
+                      <a class="compare add-to-compare" href="#" title="Add to Compare">
+                        <i class="icon anm anm-random-r"></i>
+                      </a>
+                    </div>
+                  </div>
+                  <!-- end product button -->
+                </div>
+                <!-- end product image -->
+
+                <!--start product details -->
+                <div class="product-details text-center">
+                  <!-- product name -->
+                  <div class="product-name">
+                    <a href="{{ product.url }}">{{ product.title | escape }}</a>
+                  </div>
+                  <!-- End product name -->
+                  <!-- product price -->
+                  <div class="product-price">
+                    {% if product.compare_at_price > product.price %}
+                      {% if product.price_varies %}
+                        {%- assign sale_price = product.price | money -%}
+                        {{ 'products.product.on_sale_from_html' | t: price: sale_price }}
+                      {% else %}
+                        <span class="price">{{ product.price | money }}</span>
+                      {% endif %}
+                    {% else %}
+                      {% if product.price_varies %}
+                        {%- assign price = product.price | money -%}
+                        {{ 'products.product.from_text_html' | t: price: price }}
+                      {% else %}
+                        <span class="price">{{ product.price | money }}</span>
+                      {% endif %}
+                    {% endif %}
+
+                    {% if product.compare_at_price > product.price %}
+                      <span class="old-price"><s>{{ product.compare_at_price | money }}</s></span>
+                    {% endif %}
+
+                    {% unless product.available %}
+                      {{ 'products.product.sold_out' | t }}
+                    {% endunless %}
+                  </div>
+                  <!-- End product price -->
+                </div>
+                <!-- End product details -->
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        {% if paginate.pages > 1 %}
+          {% include 'pagination' %}
+        {% endif %}
+      {% endif %}
+    {% endif %}
+  {% endpaginate %}
+
+</div>

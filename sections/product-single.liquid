@@ -1,0 +1,425 @@
+{%- assign current_variant = product.selected_or_first_available_variant -%}
+{%- assign compare_at_price = current_variant.compare_at_price -%}
+{%- assign price = current_variant.price -%}
+
+{% assign descriptions = product.description | split: "<!-- split -->" %}
+{% assign short_desc = descriptions[0] %}
+
+<script type="text/javascript">
+  window.product = {{ product | json }} || {}
+</script>
+
+<div id="MainContent" class="main-content" role="main">
+  <!--Breadcrumb-->
+  {% include 'breadcrumb', title: {{product.title}} %}
+
+  <div id="ProductSection-product-template" class="product-template__container prstyle1 container">
+    <!--product-single-->
+    <div class="product-single">
+      <div class="row">
+        <div class="col-lg-6 col-md-6 col-sm-12 col-12">
+          <div class="product-details-img">
+            <div class="product-thumb">
+              <div id="gallery" class="product-dec-slider-2 product-tab-left">
+                {% for image in product.images %}
+                  <a data-image="{{ image.src | img_url: 'master' }}"
+                    data-zoom-image="{{ image.src | img_url: 'master' }}"
+                    class="slick-slide slick-cloned" data-slick-index="-4" aria-hidden="true" tabindex="-1">
+                    <img class="blur-up lazyload" data-src="{{ image.src | img_url: 'master' }}"
+                      src="{{ image.src | img_url: 'master' }}" alt="" />
+                  </a>
+                {% endfor %}
+              </div>
+            </div>
+            <div class="zoompro-wrap product-zoom-right pl-20">
+              <div class="zoompro-span">
+                {% if product.images.first %}
+                  <img class="blur-up lazyload zoompro" alt=""
+                    src="{{ product.images[0].src | img_url: 'master' }}" />
+                {% else %}
+                  <img class="blur-up lazyload zoompro"
+                    data-zoom-image="{{ image.src | img_url: 'master' }}" alt=""
+                    src="{{ image.src | img_url: 'master' }}" />
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-12 col-12">
+          <div class="product-single__meta">
+            <h1 class="product-single__title">{{ product.title }}</h1>
+            <div class="product-nav clearfix">
+              <a href="#" class="next" title="Next"><i class="fa fa-angle-right" aria-hidden="true"></i></a>
+            </div>
+            <div class="prInfoRow">
+              <div class="product-stock">
+                {% if product.variants.first.inventory_management == "shopify" %}
+                  {% if product.variants.first.inventory_quantity > 0 %}
+                    <span class="instock"> Currently {{ product.variants.first.inventory_quantity }} in stock</span>
+                  {% else %}
+                    <span class="outstock"> Out of stock </span>
+                  {% endif %}
+                {% else %}
+                  <span class="instock"> In Stock </span>
+                {% endif %}
+              </div>
+              <div class="product-sku">
+                SKU: <span class="variant-sku">{{ current_variant.sku }}</span>
+              </div>
+            </div>
+
+            <div class="product-single__price product-single__price-product-template">
+              <span class="product-price__price product-price__price-product-template product-price__sale product-price__sale--single">
+                <span id="ProductPrice-product-template">
+                  <span data-product-price class="money">{{ price | money }}</span>
+                </span>
+              </span>
+              {% if product.compare_at_price_max > product.price %}
+                <span class="visually-hidden" data-compare-text>{{ 'products.product.regular_price' | t }}</span>
+                <s data-compare-price>
+                  {% if compare_at_price > price %}
+                    {{ compare_at_price | money }}
+                  {% endif %}
+                </s>
+              {% endif %}
+            </div>
+
+            <div class="product-review" id="shopify-product-reviews" data-id="{{product.id}}">
+              {{ product.metafields.spr.reviews }}
+            </div>
+          </div>
+
+          <div class="product-single__description rte">
+            {{ short_desc }}
+          </div>
+
+          {% if product.variants.first.inventory_quantity < 10 and product.variants.first.inventory_quantity >= 1 %}
+            <div id="quantity_message">
+              <span> Hurry! Only <strong>{{ product.variants.first.inventory_quantity }}</strong> left in stock.</span>
+            </div>
+          {% endif %}
+
+          <div class="product-form product-form-product-template hidedropdown">
+            {% form 'product', product, data-product-form: '', data-product-handle: product.handle, data-enable-history-state: 'true' %}
+              {% unless product.has_only_default_variant %}
+                <div class="product-form__controls-group">
+                  {% for option in product.options_with_values %}
+                    <div class="product-category">
+                      <label>{{ option.name }}</label>
+                      <select data-index="option{{ forloop.index }}">
+                        {% for value in option.values %}
+                          <option value="{{ value | escape }}"{% if option.selected_value == value %} selected="selected"{% endif %}>{{ value }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                  {% endfor %}
+                </div>
+              {% endunless %}
+
+              <p class="infolinks"><a href="#sizechart" class="sizelink btn">Size Guide</a></p>
+
+              <!-- Product Action -->
+              <div class="product-action clearfix">
+                <div class="product-form__item--quantity">
+                  <div class="wrapQtyBtn">
+                    <div class="qtyField">
+                      <input class="cart__qty-input"
+                        type="number"
+                        name="quantity"
+                        id="Quantity"
+                        value="1"
+                        min="1"
+                        pattern="[0-9]*"
+                        {% if product.variants.first.inventory_management == "shopify" and
+                          product.variants.first.inventory_policy == 'deny' %}
+                          max="{{- product.variants.first.inventory_quantity -}}"
+                        {% endif %} >
+                    </div>
+                  </div>
+                </div>
+                <div class="product-form__item--submit">
+                  <input type="hidden" name="id" id="variant-id" value="{{ product.variants.first.id }}" />
+                  <button
+                    type="submit"
+                    class="btn"
+                    name="add"
+                    data-submit-button
+                    {% unless current_variant.available %}disabled="disabled"{% endunless %}>
+                    <span data-submit-button-text>
+                      {% if current_variant.available %}
+                        {{ 'products.product.add_to_cart' | t }}
+                      {% else %}
+                        {{ 'products.product.sold_out' | t }}
+                      {% endif %}
+                    </span>
+                  </button>
+                </div>
+                {{ form | payment_button }}
+              </div>
+              <!-- End Product Action -->
+            {% endform %}
+          </div>
+          <div class="display-table shareRow">
+            <div class="display-table-cell medium-up--one-third">
+              <div class="wishlist-btn">
+                <a class="wishlist add-to-wishlist" href="#" title="Add to Wishlist"><i class="icon anm anm-heart-l"
+                  aria-hidden="true"></i> <span>Add to Wishlist</span>
+                </a>
+              </div>
+            </div>
+            <div class="display-table-cell text-right">
+              <div class="social-sharing">
+                {% if section.settings.show_share_buttons %}
+                  {% include 'social-sharing', share_title: product.title, share_permalink: product.url, share_image: product %}
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--End-product-single-->
+    <!--Product Tabs-->
+    <div class="tabs-listing">
+      <ul class="product-tabs">
+        <li rel="tab1"><a class="tablink">Product Details</a></li>
+        <li rel="tab3"><a class="tablink">Size Chart</a></li>
+        <li rel="tab4"><a class="tablink">Shipping &amp; Returns</a></li>
+      </ul>
+      <div class="tab-container">
+        <div id="tab1" class="tab-content">
+          <div class="product-description rte">
+            {{ product.description }}
+          </div>
+        </div>
+        <div id="tab3" class="tab-content">
+          <h3>WOMEN'S BODY SIZING CHART</h3>
+          <table>
+            <tbody>
+              <tr>
+                <th>Size</th>
+                <th>XS</th>
+                <th>S</th>
+                <th>M</th>
+                <th>L</th>
+                <th>XL</th>
+              </tr>
+              <tr>
+                <td>Chest</td>
+                <td>31" - 33"</td>
+                <td>33" - 35"</td>
+                <td>35" - 37"</td>
+                <td>37" - 39"</td>
+                <td>39" - 42"</td>
+              </tr>
+              <tr>
+                <td>Waist</td>
+                <td>24" - 26"</td>
+                <td>26" - 28"</td>
+                <td>28" - 30"</td>
+                <td>30" - 32"</td>
+                <td>32" - 35"</td>
+              </tr>
+              <tr>
+                <td>Hip</td>
+                <td>34" - 36"</td>
+                <td>36" - 38"</td>
+                <td>38" - 40"</td>
+                <td>40" - 42"</td>
+                <td>42" - 44"</td>
+              </tr>
+              <tr>
+                <td>Regular inseam</td>
+                <td>30"</td>
+                <td>30½"</td>
+                <td>31"</td>
+                <td>31½"</td>
+                <td>32"</td>
+              </tr>
+              <tr>
+                <td>Long (Tall) Inseam</td>
+                <td>31½"</td>
+                <td>32"</td>
+                <td>32½"</td>
+                <td>33"</td>
+                <td>33½"</td>
+              </tr>
+            </tbody>
+          </table>
+          <h3>MEN'S BODY SIZING CHART</h3>
+          <table>
+            <tbody>
+              <tr>
+                <th>Size</th>
+                <th>XS</th>
+                <th>S</th>
+                <th>M</th>
+                <th>L</th>
+                <th>XL</th>
+                <th>XXL</th>
+              </tr>
+              <tr>
+                <td>Chest</td>
+                <td>33" - 36"</td>
+                <td>36" - 39"</td>
+                <td>39" - 41"</td>
+                <td>41" - 43"</td>
+                <td>43" - 46"</td>
+                <td>46" - 49"</td>
+              </tr>
+              <tr>
+                <td>Waist</td>
+                <td>27" - 30"</td>
+                <td>30" - 33"</td>
+                <td>33" - 35"</td>
+                <td>36" - 38"</td>
+                <td>38" - 42"</td>
+                <td>42" - 45"</td>
+              </tr>
+              <tr>
+                <td>Hip</td>
+                <td>33" - 36"</td>
+                <td>36" - 39"</td>
+                <td>39" - 41"</td>
+                <td>41" - 43"</td>
+                <td>43" - 46"</td>
+                <td>46" - 49"</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div id="tab4" class="tab-content">
+          <h4>Returns Policy</h4>
+          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce eros justo, accumsan non dui sit amet.
+            Phasellus semper volutpat mi sed imperdiet. Ut odio lectus, vulputate non ex non, mattis sollicitudin purus.
+            Mauris consequat justo a enim interdum, in consequat dolor accumsan. Nulla iaculis diam purus, ut vehicula
+            leo efficitur at.</p>
+          <p>Interdum et malesuada fames ac ante ipsum primis in faucibus. In blandit nunc enim, sit amet pharetra erat
+            aliquet ac.</p>
+          <h4>Shipping</h4>
+          <p>Pellentesque ultrices ut sem sit amet lacinia. Sed nisi dui, ultrices ut turpis pulvinar. Sed fringilla ex
+            eget lorem consectetur, consectetur blandit lacus varius. Duis vel scelerisque elit, et vestibulum metus.
+            Integer sit amet tincidunt tortor. Ut lacinia ullamcorper massa, a fermentum arcu vehicula ut. Ut efficitur
+            faucibus dui Nullam tristique dolor eget turpis consequat varius. Quisque a interdum augue. Nam ut nibh
+            mauris.</p>
+        </div>
+      </div>
+    </div>
+    <!--End Product Tabs-->
+  </div>
+</div>
+
+<div class="hide">
+  <div id="sizechart">
+    <h3>WOMEN'S BODY SIZING CHART</h3>
+    <table>
+      <tbody>
+        <tr>
+          <th>Size</th>
+          <th>XS</th>
+          <th>S</th>
+          <th>M</th>
+          <th>L</th>
+          <th>XL</th>
+        </tr>
+        <tr>
+          <td>Chest</td>
+          <td>31" - 33"</td>
+          <td>33" - 35"</td>
+          <td>35" - 37"</td>
+          <td>37" - 39"</td>
+          <td>39" - 42"</td>
+        </tr>
+        <tr>
+          <td>Waist</td>
+          <td>24" - 26"</td>
+          <td>26" - 28"</td>
+          <td>28" - 30"</td>
+          <td>30" - 32"</td>
+          <td>32" - 35"</td>
+        </tr>
+        <tr>
+          <td>Hip</td>
+          <td>34" - 36"</td>
+          <td>36" - 38"</td>
+          <td>38" - 40"</td>
+          <td>40" - 42"</td>
+          <td>42" - 44"</td>
+        </tr>
+        <tr>
+          <td>Regular inseam</td>
+          <td>30"</td>
+          <td>30½"</td>
+          <td>31"</td>
+          <td>31½"</td>
+          <td>32"</td>
+        </tr>
+        <tr>
+          <td>Long (Tall) Inseam</td>
+          <td>31½"</td>
+          <td>32"</td>
+          <td>32½"</td>
+          <td>33"</td>
+          <td>33½"</td>
+        </tr>
+      </tbody>
+    </table>
+    <h3>MEN'S BODY SIZING CHART</h3>
+    <table>
+      <tbody>
+        <tr>
+          <th>Size</th>
+          <th>XS</th>
+          <th>S</th>
+          <th>M</th>
+          <th>L</th>
+          <th>XL</th>
+          <th>XXL</th>
+        </tr>
+        <tr>
+          <td>Chest</td>
+          <td>33" - 36"</td>
+          <td>36" - 39"</td>
+          <td>39" - 41"</td>
+          <td>41" - 43"</td>
+          <td>43" - 46"</td>
+          <td>46" - 49"</td>
+        </tr>
+        <tr>
+          <td>Waist</td>
+          <td>27" - 30"</td>
+          <td>30" - 33"</td>
+          <td>33" - 35"</td>
+          <td>36" - 38"</td>
+          <td>38" - 42"</td>
+          <td>42" - 45"</td>
+        </tr>
+        <tr>
+          <td>Hip</td>
+          <td>33" - 36"</td>
+          <td>36" - 39"</td>
+          <td>39" - 41"</td>
+          <td>41" - 43"</td>
+          <td>43" - 46"</td>
+          <td>46" - 49"</td>
+        </tr>
+      </tbody>
+    </table>
+    <div style="padding-left: 30px;"><img src="{{ 'size.jpg' | asset_url  }}" alt=""></div>
+  </div>
+</div>
+
+
+{% schema %}
+  {
+    "name": "Product pages",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "show_share_buttons",
+        "label": "Show social sharing buttons",
+        "default": true
+      }
+    ]
+  }
+{% endschema %}

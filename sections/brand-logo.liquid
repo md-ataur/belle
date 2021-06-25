@@ -1,0 +1,48 @@
+<div class="section logo-section">
+  <div class="container">
+    <div class="row">
+      <div class="col-12 col-sm-12 col-md-12 col-lg-12">
+        <div class="section-header text-center">
+          <h2 class="h2">{{ section.settings.title }}</h2>
+        </div>
+        <div class="logo-bar">
+          {% for block in section.blocks %}
+            {% if block.settings.image != blank %}
+              <div class="logo-bar__item">
+                <img src="{{ block.settings.image | img_url: 'master' }}" alt="" title="" />
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+{% schema %}
+{
+  "name": "Brand Logo",
+  "max_blocks": 10,
+  "settings": [
+    {
+      "type": "text",
+      "id"  : "title",
+      "label": "Title"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "image",
+      "name": "Logo",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

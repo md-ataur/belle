@@ -1,0 +1,134 @@
+<!--Page Title-->
+<div class="page section-header text-center mb-0">
+  <div class="page-title">
+    <div class="wrapper">
+      <h1 class="page-width">Contact Us</h1>
+    </div>
+  </div>
+</div>
+<!--End Page Title-->
+<div class="map-section map mb-5">
+  <iframe src="https://www.google.com/maps/embed?pb=" height="350" allowfullscreen></iframe>
+</div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-12 col-sm-12 col-md-8 col-lg-8 mb-4">
+      <div class="formFeilds contact-form form-vertical">
+        {% form 'contact' %}
+          {% if form.posted_successfully? %}
+            <p class="form-success alert alert-success">
+              {{ 'contact.form.post_success' | t }}
+            </p>
+          {% endif %}
+
+          {{ form.errors | default_errors }}
+
+          <div class="row">
+            <div class="col-12 col-sm-12 col-md-6 col-lg-6">
+              <div class="form-group">
+                <input type="text"
+                  name="contact[name]"
+                  id="ContactFormName"
+                  placeholder="{{ 'contact.form.name' | t }}"
+                  value="{% if form[name] %}{{ form[name] }}{% elsif customer %}{{ customer.name }}{% endif %}">
+              </div>
+            </div>
+            <div class="col-12 col-sm-12 col-md-6 col-lg-6">
+              <div class="form-group">
+                <input type="email"
+                  name="contact[email]"
+                  id="ContactFormEmail"
+                  placeholder="{{ 'contact.form.email' | t }}"
+                  value="{% if form.email %}{{ form.email }}{% elsif customer %}{{ customer.email }}{% endif %}"
+                  spellcheck="false"
+                  autocomplete="off"
+                  autocapitalize="off"
+                  required="">
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12 col-sm-12 col-md-6 col-lg-6">
+              <div class="form-group">
+                <select id="ContactFormFlavor" name="contact[Flavor]">
+                  <option>Select your flavor</option>
+                  <option>Chocolate</option>
+                  <option>Vanilla</option>
+                  <option>Strawberry</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-12 col-sm-12 col-md-6 col-lg-6">
+              <div class="form-group">
+                <input type="tel"
+                  name="contact[phone]"
+                  id="ContactFormPhone"
+                  placeholder="{{ 'contact.form.phone' | t }}"
+                  value="{% if form[phone] %}{{ form.phone }}{% elsif customer %}{{ customer.phone }}{% endif %}"
+                  pattern="[0-9\-]*">
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12 col-sm-12 col-md-6 col-lg-6">
+              <div class="form-group">
+                <input
+                  type="date"
+                  id="ContactFormBirthday"
+                  name="contact[Birthday]"
+                  placeholder="Birthday" />
+              </div>
+            </div>
+            <div class="col-12 col-sm-12 col-md-6 col-lg-6">
+              <div class="form-group">
+                <label>Do you prefer tea or coffee?</label><br />
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" id="ContactFormTea" name="contact[Tea or Coffee]" value="Tea">
+                  <label class="form-check-label" for="inlineRadio1">Tea</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" id="contactFormCoffee" name="contact[Tea or Coffee]" value="Coffee">
+                  <label class="form-check-label" for="inlineRadio2">Coffee</label>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12 col-sm-12 col-md-12 col-lg-12">
+              <div class="form-group">
+                <textarea rows="10"
+                  name="contact[body]"
+                  id="ContactFormMessage"
+                  placeholder="{{ 'contact.form.message' | t }}">
+                  {%- if form.body -%}
+                    {{- form.body -}}
+                  {%- endif -%}
+                </textarea>
+
+                <label for="ContactFormKitten">Do you agree with our terms and condition?</label><br />
+                <input type="checkbox" id="ContactFormKitten" name="contact[Terms & Condition]" value="Yes" /> Yes
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12 col-sm-12 col-md-12 col-lg-12">
+              <input type="submit" class="btn" value="{{ 'contact.form.send' | t }}">
+            </div>
+          </div>
+        {% endform %}
+      </div>
+    </div>
+    <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+      <div class="open-hours">
+        <strong>Opening Hours</strong><br>
+        Mon - Sat : 9am - 11pm<br>
+        Sunday: 11am - 5pm
+      </div>
+      <hr />
+      <div class="addressFooter">
+        {% section 'contact-address' %}
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,185 @@
+<div class="page section-header text-center">
+  <div class="page-title">
+    <div class="wrapper"><h1 class="page-width">{{ 'cart.general.title' | t }}</h1></div>
+  </div>
+</div>
+<div class="container">
+  {% if cart.item_count > 0 %}
+    <form action="/cart" method="post" novalidate class="cart style2">
+      <div class="row">
+        <div class="col-12 col-sm-12 col-md-12 col-lg-12 main-col">
+          <table>
+            <thead class="cart__row cart__header">
+              <tr>
+                <th colspan="2" class="text-center">{{ 'cart.label.product' | t }}</th>
+                <th class="text-center">{{ 'cart.label.price' | t }}</th>
+                <th class="text-center">{{ 'cart.label.quantity' | t }}</th>
+                <th class="text-right">{{ 'cart.label.total' | t }}</th>
+                <th class="action">&nbsp;</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in cart.items %}
+                <tr class="cart__row border-bottom line1 cart-flex border-top">
+                  <td class="cart__image-wrapper cart-flex-item" data-label="{{ 'customer.order.product' | t }}">
+                    {% if item.image != blank %}
+                      <a href="{{ item.url | within: collections.all }}">
+                        <img src="{{ item | img_url: 'medium' }}" alt="">
+                      </a>
+                    {% endif %}
+                  </td>
+                  <td class="cart__meta small--text-left cart-flex-item">
+                    <div class="list-view-item__title">
+                      <a href="{{ item.url }}">{{ item.product.title }}</a>
+                    </div>
+                    <div class="cart__meta-text">
+                      {% unless item.product.has_only_default_variant %}
+                        <label>{{ item.variant.title }}</label>
+                      {% endunless %}
+                      <p>{{ item.vendor }}</p>
+                    </div>
+                  </td>
+                  <td class="cart__price-wrapper cart-flex-item">
+                    {% if item.original_line_price != item.line_price %}
+                      <span class="visually-hidden">{{ 'cart.label.discounted_price' | t }}</span>
+                      {{ item.price | money }}
+                      <span class="visually-hidden">{{ 'cart.label.original_price' | t }}</span>
+                      <s>{{ item.original_price | money }}</s>
+                    {% else %}
+                      {{ item.price | money }}
+                    {% endif %}
+                  </td>
+                  <td class="cart__update-wrapper cart-flex-item text-right">
+                    <div class="cart__qty text-center">
+                      <div class="qtyField">
+                        <input class="cart__qty-input"
+                          type="number"
+                          name="updates[]"
+                          id="updates_{{ item.key }}"
+                          value="{{ item.quantity }}"
+                          min="0"
+                          pattern="[0-9]*"
+                          {% if item.variant.inventory_management == 'shopify' and
+                            item.variant.inventory_policy == 'deny' %}
+                            max="{{- item.variant.inventory_quantity -}}"
+                          {% endif %} >
+                      </div>
+                    </div>
+                  </td>
+                  <td class="text-right small--hide cart-price">
+                    <div><span class="money">{{ item.line_price | money }}</span></div>
+                  </td>
+                  <td class="text-center small--hide">
+                    <a class="btn btn--secondary cart__remove" href="/cart/change?line={{ forloop.index }}&amp;quantity=0" title="Remove tem">
+                      <i class="icon icon anm anm-times-l"></i>
+                    </a>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="3" class="text-left">
+                  <a href="/collections/all" class="btn btn-secondary btn--small cart-continue">Continue shopping</a>
+                </td>
+                <td colspan="3" class="text-right">
+                  <a href="/cart/clear" class="btn btn-secondary btn--small  small--hide">Clear Cart</a>
+                  <button type="submit" name="update" class="btn btn-secondary btn--small cart-continue ml-2">{{ 'cart.general.update' | t }}</button>
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+        <div class="container mt-4">
+          <div class="row">
+            <div class="col-12 col-sm-12 col-md-4 col-lg-4 mb-4">
+              <h5>Discount Codes</h5>
+              <form action="#" method="post">
+                <div class="form-group">
+                  <label for="address_zip">Enter your coupon code if you have one.</label>
+                  <input type="text" name="coupon">
+                </div>
+                <div class="actionRow">
+                  <div><input type="button" class="btn btn-secondary btn--small" value="Apply Coupon"></div>
+                </div>
+              </form>
+            </div>
+            <div class="col-12 col-sm-12 col-md-4 col-lg-4 mb-4">
+              <h5>Estimate Shipping and Tax</h5>
+              <form action="#" method="post">
+                <div class="form-group">
+                  <label for="address_country">Country</label>
+                  <select id="address_country" name="address[country]" data-default="United States">
+                    <option value="Belgium" data-provinces="[]">Belgium</option>
+                    <option value="Afghanistan" data-provinces="[]">Afghanistan</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label>State</label>
+                  <select id="address_province" name="address[province]" data-default="">
+                    <option value="Alabama">Alabama</option>
+                    <option value="Alaska">Alaska</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="address_zip">Postal/Zip Code</label>
+                  <input type="text" id="address_zip" name="address[zip]">
+                </div>
+
+                <div class="actionRow">
+                  <div><input type="button" class="btn btn-secondary btn--small" value="Calculate shipping"></div>
+                </div>
+              </form>
+            </div>
+            <div class="col-12 col-sm-12 col-md-4 col-lg-4 cart__footer">
+              <div class="solid-border">
+                <div class="row border-bottom pb-2">
+                  <span class="col-12 col-sm-6 cart__subtotal-title">{{ 'cart.general.subtotal' | t }}</span>
+                  <span class="col-12 col-sm-6 text-right"><span class="money">{{ cart.total_price | money }}</span></span>
+                  {% if cart.total_discounts > 0 %}
+                    <p>{{ 'cart.general.savings' | t }} {{ cart.total_discounts | money }}</p>
+                  {% endif %}
+                </div>
+                {% if cart.total_discounts > 0 %}
+                  <div class="row border-bottom pb-2 pt-2">
+                    <span class="col-12 col-sm-6 cart__subtotal-title">{{ 'cart.general.savings' | t }}</span>
+                    <span class="col-12 col-sm-6 text-right">{{ cart.total_discounts | money }}</span>
+                  </div>
+                {% endif %}
+                <div class="row border-bottom pb-2 pt-2">
+                  <span class="col-12 col-sm-6 cart__subtotal-title">Shipping</span>
+                  <span class="col-12 col-sm-6 text-right">Free shipping</span>
+                </div>
+                <div class="row border-bottom pb-2 pt-2 mb-3">
+                  <span class="col-12 col-sm-6 cart__subtotal-title"><strong>Grand Total</strong></span>
+                  <span class="col-12 col-sm-6 cart__subtotal-title cart__subtotal text-right">
+                    <span class="money">{{ cart.total_price | money }}</span></span>
+                </div>
+                <input type="submit" name="checkout" id="cartCheckout" class="btn btn--small-wide checkout" value="{{ 'cart.general.checkout' | t }}">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  {% else %}
+    {% comment %}
+    Cart empty state
+    {% endcomment %}
+    <div class="supports-cookies">
+      <p>{{ 'cart.general.empty' | t }}</p>
+      <p>{{ 'cart.general.continue_browsing_html' | t }}</p>
+    </div>
+
+    {% comment %}
+    Cart no cookies state
+    ---------------------
+    Browser cookies are required to use the cart. If cookies aren't enabled in the
+    browser a message is displayed prompting the user to enable them.
+    {% endcomment %}
+    <div class="supports-no-cookies">
+      <p>{{ 'cart.general.cookies_required' | t }}</p>
+    </div>
+  {% endif %}
+</div>

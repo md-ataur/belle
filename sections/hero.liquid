@@ -1,0 +1,70 @@
+<div class="slideshow slideshow-wrapper pb-section">
+  <div class="home-slideshow">
+    {% for block in section.blocks %}
+      <div class="slide">
+        <div class="blur-up lazyload">
+          <img class="blur-up lazyload" data-src="{{ block.settings.image | img_url:'master' }}"
+            src="{{ block.settings.image | img_url:'master' }}" alt="Shop Our New Collection"
+            title="Shop Our New Collection" />
+          <div class="slideshow__text-wrap slideshow__overlay classic middle">
+            <div class="slideshow__text-content middle">
+              <div class="container">
+                <div class="wrap-caption right">
+                  <h2 class="h1 mega-title slideshow__title">{{ block.settings.title }}</h2>
+                  <span class="mega-subtitle slideshow__subtitle">{{ block.settings.subtitle }}</span>
+                  <a href="{{ block.settings.button_link }}"><span class="btn">{{ block.settings.button_text }}</span></a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Hero Section",
+  "max_blocks": 6,
+  "blocks": [
+    {
+      "type": "image",
+      "name": "Slider Image",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title"
+        },
+        {
+          "type": "text",
+          "id": "subtitle",
+          "label": "Sub Title"
+        },
+        {
+          "type": "text",
+          "id": "button_text",
+          "label": "Button Text"
+        },
+        {
+          "type": "url",
+          "id": "button_link",
+          "label": "Button Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Home slider",
+      "category": "Image"
+    }
+  ]
+}
+{% endschema %}

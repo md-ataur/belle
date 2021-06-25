@@ -1,0 +1,108 @@
+.product-form__controls-group {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.product-category {
+    flex-basis: 50%;
+    padding: 0 5px;
+    margin: 0 0 15px 0;
+}
+
+.shopify-payment-button__more-options {
+    display: none !important;
+}
+
+.social-sharing span {
+    display: inline-block;
+    vertical-align: text-bottom;
+}
+
+.social-sharing a {
+    font-size: 14px;
+    margin: 0 0 0 4px;
+}
+
+.social-sharing a:hover {
+    text-decoration: none;
+    color: #767676;
+}
+
+.modal-dialog {
+    max-width: 800px;
+    background-color: #fff;
+    padding: 25px;
+}
+
+.modal-content {
+    border: 0;
+}
+
+.modal-body {
+    border: 0;
+    padding: 0;
+}
+
+.modal-dialog .product-single {
+    margin: 0;
+}
+
+.modal-dialog .product-details-img {
+    margin: 0;
+}
+
+.modal-dialog .product-single__meta {
+    margin: 0;
+}
+
+.modal-dialog .display-table.shareRow {
+    padding: 0;
+}
+
+.modal-dialog .product-single__price {
+    margin: 0 0 10px;
+}
+
+.addressFooter ul li i {
+    font-size: 18px;
+    margin: 0 4px 0 0;
+}
+
+.cart__row {
+    border-top: none !important;
+}
+
+.cart__price-wrapper {
+    text-align: center;
+}
+
+.load-more {
+    clear: both;
+    padding: 15px 0 30px;
+    text-align: center;
+}
+
+.load-more__btn {
+    color: #fff !important;
+}
+
+.load-more__spinner {
+    display: none;
+    width: 35px;
+    height: 35px;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #3a3a3a;
+    border-radius: 50%;
+    margin-left: auto;
+    margin-right: auto;
+    animation: spin 2s linear infinite;
+}
+
+input#HideRecoverPassword {
+    background: #868686;
+}
+
+@keyframes spin {
+    0% {transform: rotate(0deg)}
+    100% {transform: rotate(360deg)}
+}
